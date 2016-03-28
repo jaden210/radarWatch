@@ -15,17 +15,27 @@ body {
     vertical-align: middle;
     
 }
-#over {
-	width: 100%;
+#clock {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 110px;
+  text-align: center;
+  display: table-cell;
+  vertical-align: middle;
+}
+#dots {
+  width: 100%;
   height: 100%;
   position: absolute;
   top: 0;
   left: 0;
   display: table-cell;
   vertical-align: middle;
+   
 }
-#under {
-	width: 100%;
+#background {
+  width: 100%;
   height: 100%;
   position: absolute;
   top: 0;
@@ -34,7 +44,7 @@ body {
   vertical-align: middle;
   background: url('../src/background.png') no-repeat 0 0;
 }
-#main { 
+#spinner { 
     -moz-animation:8s rotateRight infinite linear; 
     -webkit-animation:6s rotateRight infinite linear; 
     background: url('../src/spinner.png') no-repeat 0 0;

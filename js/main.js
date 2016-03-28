@@ -1,4 +1,4 @@
-var canvas, context, clockRadius, isAmbientMode;
+var canvas,bCanvas,bContext, context, clockRadius, isAmbientMode;
 
 window.requestAnimationFrame = window.requestAnimationFrame ||
     window.webkitRequestAnimationFrame ||
@@ -9,7 +9,17 @@ window.requestAnimationFrame = window.requestAnimationFrame ||
         'use strict';
         window.setTimeout(callback, 1000 / 60);
     };
-var bCounter = 0;
+var bs = "#00ff00";
+var hcounter = 0,
+	mcounter = 0,
+	scounter = 0,
+	tcounter = 0;
+var hb = 0.3,
+	mb = 0.3,
+	sb = 0.3,
+	tb = 0.3;
+
+	
 function renderDots() {
     'use strict';
 
@@ -23,7 +33,7 @@ function renderDots() {
     context.translate(canvas.width / 2, canvas.height / 2);
 }
 
-function renderTime(hour, hb, minute, mb, second, sb, bLevel, bs) {
+function renderTime(hour, hb, minute, mb, second, sb, time ,tb) {
     'use strict';
 
     var angle = null,
@@ -35,12 +45,12 @@ function renderTime(hour, hb, minute, mb, second, sb, bLevel, bs) {
     	syangle = null,
         radius = null;
 
-    hxangle = 50* Math.cos(((hour-3)*-1) * (Math.PI * 2) / 12);
-    hyangle = 50* Math.sin(((hour-3)   ) * (Math.PI * 2) / 12);
-    mxangle = 94* Math.cos(((minute-15)*-1) * (Math.PI * 2) / 60);
-    myangle = 94* Math.sin(((minute-15)   ) * (Math.PI * 2) / 60);
-    sxangle = 150* Math.cos(((second-15)*-1) * (Math.PI * 2) / 60);
-    syangle = 150* Math.sin(((second-15)   ) * (Math.PI * 2) / 60);
+    hxangle = 96* Math.cos(((hour-3)*-1) * (Math.PI * 2) / 12);
+    hyangle = 96* Math.sin((hour-3)      * (Math.PI * 2) / 12);
+    mxangle = 138* Math.cos(((minute-15)*-1) * (Math.PI * 2) / 60);
+    myangle = 138* Math.sin((minute-15)      * (Math.PI * 2) / 60);
+    sxangle = 160* Math.cos(((second-15)*-1) * (Math.PI * 2) / 60);
+    syangle = 160* Math.sin((second-15)      * (Math.PI * 2) / 60);
     radius = clockRadius * 0.55;
     //RENDER
     context.save();
@@ -51,26 +61,25 @@ function renderTime(hour, hb, minute, mb, second, sb, bLevel, bs) {
     context.shadowBlur = 30;
     context.globalAlpha = mb;
     context.fillStyle = '#22ef0c';
-    context.arc(mxangle,myangle,20,0,Math.PI * 2, true);
+    context.arc(mxangle,myangle,10,0,Math.PI * 2, true);
     context.closePath();
     context.fill();
     context.beginPath();
     context.globalAlpha = hb;    
-    context.arc(hxangle,hyangle,20,0,Math.PI * 2, true);
+    context.arc(hxangle,hyangle,10,0,Math.PI * 2, true);
     context.closePath();
     context.fill();
     context.beginPath();
     context.globalAlpha = sb;
-    context.arc(sxangle,syangle,20,0,Math.PI * 2, true);
+    context.arc(sxangle,syangle,10,0,Math.PI * 2, true);
     context.closePath();
     context.fill();
-    context.beginPath();
-    context.strokeStyle = bs;
-    context.globalAlpha = 1;
-    context.lineWidth = 7;
-    context.arc(0,0,178,1.5 * Math.PI,bLevel * (Math.PI / 180) + 1.5 * Math.PI);
-    context.stroke();
     context.restore();
+
+    document.getElementById("clock").innerHTML = time;
+    document.getElementById("clock").style.color="#22ef0c";
+    document.getElementById("clock").style.opacity=0.8;
+    document.getElementById("clock").style.fontSize="xx-large";
 }
 
 
@@ -103,57 +112,21 @@ function watch() {
         hour = hours + (minutes /100),
         minute = minutes + seconds / 60,
         second = seconds + mili/3600,
-        nextMove = 95;
+        nextMove = 100;
 
     if (hour >= 12) {
     	tempHour = hour - 12;
     }else {
     	tempHour = hour;
     }
-    //battery stuff
-    var battery = navigator.battery || navigator.webkitBattery || navigator.mozBattery || navigator.msBattery;
-    if (battery) {
-    	   // battery status for firefox 
-    			var bLevel = (battery.level * 360);
-    	} else if (navigator.getBattery) {
-    	   //battery status for chrome
-    	   navigator.getBattery().then(function(battery) {
-    		   var bLevel = (battery.level * 360);
-    	   });
-    	}
     
     //blip counter
     var hourBlip = tempHour*5,
     	minuteBlip = minute,
-    	secondBlip = second,
-    	hb = .5,
-    	mb = .5,
-    	sb = .5,
-    	bs = "#00ff00";
-    	
+    	secondBlip = second;
     
-    // Erase the previous time
-    context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-    renderDots();
-    
-    if (bCounter > hourBlip && bCounter < hourBlip + 7) {
-    	hb = .8;
-    }else {
-    	hb = .3;
-    }
-    if (bCounter > minuteBlip && bCounter < minuteBlip + 7) {
-    	mb = .8;
-    }else {
-    	mb = .3;
-    }
-    if (bCounter > secondBlip && bCounter < secondBlip + 7) {
-    	sb = .8;
-    }else {
-    	sb = .3;
-    }
- 
-    //find the rotation of the div
-    var el = document.getElementById("main");
+  //find the rotation of the radar
+    var el = document.getElementById("spinner");
     var st = window.getComputedStyle(el, null);
     var tr = st.getPropertyValue("-webkit-transform") ||
              st.getPropertyValue("-moz-transform") ||
@@ -161,7 +134,6 @@ function watch() {
              st.getPropertyValue("-o-transform") ||
              st.getPropertyValue("transform") ||
              "fail...";
-
     // With rotate(30deg)...
     var values = tr.split('(')[1];
          values = values.split(')')[0];
@@ -172,19 +144,241 @@ function watch() {
      var d = values[3];
 
      var scale = Math.sqrt(a*a + b*b);
-     var angle1 = Math.round(Math.atan2(b, a) * (180/Math.PI));
-
-     if (bLevel < 75) {
-    	 bs = "#ff0000"
+     //fix radar angle
+     var radarAngle = Math.round(Math.atan2(b, a) * (180/Math.PI));
+     if (radarAngle <= 0) {
+    	 radarAngle = (radarAngle + 180) + 180;
      }
+     var hourAngle = tempHour * 30,
+     	 minuteAngle = minute * 6,
+     secondAngle = Math.floor(second) * 6;
+    	
     
-    if ( angle1 > - 7 && angle1 < 7) {
-    	bCounter = 0;
-    }else {
-    	bCounter ++;
+    // Erase the previous time
+    context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+    renderDots();
+    
+    //hour blip fade
+    if (radarAngle > hourAngle && radarAngle < hourAngle + 20) {
+    	hb =0.9;
+    }
+    if (hb > 0.3) {
+    	hcounter ++;
+    }
+    switch (hcounter) {
+    case 2:
+    	hb = 0.80;
+    	break;
+    case 4:
+    	hb = 0.78;
+    	break;
+    case 6:
+    	hb = 0.74;
+    	break;
+    case 8:
+    	hb = 0.70;
+    	break;
+    case 10:
+    	hb = 0.66;
+    	break;
+    case 12:
+    	hb = 0.62;
+    	break;
+    case 14:
+    	hb = 0.58;
+    	break;
+    case 16:
+    	hb = 0.54;
+    	break;
+    case 18:
+    	hb = 0.50;
+    	break;
+    case 20:
+    	hb = 0.46;
+    	break;
+    case 22:
+    	hb = 0.42;
+    	break;
+    case 24:
+    	hb = 0.38;
+    	break;
+    case 26:
+    	hb = 0.34;
+    	break;
+    case 28:
+    	hb = 0.3;
+    	hcounter = 0;
+    	break;
     }
     
-    renderTime(hour, hb, minute, mb, second, sb, bLevel, bs);
+    //minute blip fade
+    if (radarAngle > minuteAngle && radarAngle < minuteAngle + 20) {
+    	mb =0.9;
+    }
+    if (mb > 0.3) {
+    	mcounter ++;
+    }
+    switch (mcounter) {
+    case 2:
+    	mb = 0.80;
+    	break;
+    case 4:
+    	mb = 0.78;
+    	break;
+    case 6:
+    	mb = 0.74;
+    	break;
+    case 8:
+    	mb = 0.70;
+    	break;
+    case 10:
+    	mb = 0.66;
+    	break;
+    case 12:
+    	mb = 0.62;
+    	break;
+    case 14:
+    	mb = 0.58;
+    	break;
+    case 16:
+    	mb = 0.54;
+    	break;
+    case 18:
+    	mb = 0.50;
+    	break;
+    case 20:
+    	mb = 0.46;
+    	break;
+    case 22:
+    	mb = 0.42;
+    	break;
+    case 24:
+    	mb = 0.38;
+    	break;
+    case 26:
+    	mb = 0.34;
+    	break;
+    case 28:
+    	mb = 0.3;
+    	mcounter = 0;
+    	break;
+    }
+    
+    //second blib fade
+    if (radarAngle > secondAngle && radarAngle < secondAngle + 20) {
+    	sb =0.9;
+    }
+    if (sb > 0.3) {
+    	scounter ++;
+    }
+    switch (scounter) {
+    case 2:
+    	sb = 0.80;
+    	break;
+    case 4:
+    	sb = 0.78;
+    	break;
+    case 6:
+    	sb = 0.74;
+    	break;
+    case 8:
+    	sb = 0.70;
+    	break;
+    case 10:
+    	sb = 0.66;
+    	break;
+    case 12:
+    	sb = 0.62;
+    	break;
+    case 14:
+    	sb = 0.58;
+    	break;
+    case 16:
+    	sb = 0.54;
+    	break;
+    case 18:
+    	sb = 0.50;
+    	break;
+    case 20:
+    	sb = 0.46;
+    	break;
+    case 22:
+    	sb = 0.42;
+    	break;
+    case 24:
+    	sb = 0.38;
+    	break;
+    case 26:
+    	sb = 0.34;
+    	break;
+    case 28:
+    	sb = 0.3;
+    	scounter = 0;
+    	break;
+    }
+    
+    //time fade
+    if (radarAngle > 0 && radarAngle <  20) {
+    	tb =0.9;
+    }
+    if (tb > 0.3) {
+    	tcounter ++;
+    }
+    switch (tcounter) {
+    case 2:
+    	tb = 0.80;
+    	break;
+    case 4:
+    	tb = 0.78;
+    	break;
+    case 6:
+    	tb = 0.74;
+    	break;
+    case 8:
+    	tb = 0.70;
+    	break;
+    case 10:
+    	tb = 0.66;
+    	break;
+    case 12:
+    	tb = 0.62;
+    	break;
+    case 14:
+    	tb = 0.58;
+    	break;
+    case 16:
+    	tb = 0.54;
+    	break;
+    case 18:
+    	tb = 0.50;
+    	break;
+    case 20:
+    	tb = 0.46;
+    	break;
+    case 22:
+    	tb = 0.42;
+    	break;
+    case 24:
+    	tb = 0.38;
+    	break;
+    case 26:
+    	tb = 0.34;
+    	break;
+    case 28:
+    	tb = 0.3;
+    	tcounter = 0;
+    	break;
+    }
+    
+    
+    if	(hours > 12) {
+    	var thour = hours - 12;
+    }else {
+    	var thour = hours;
+    }
+   var time =  ("00" + thour).slice(-2) + ":" + ("0" + minutes).slice(-2) + ":" + ("0" + seconds).slice(-2); 
+    
+    renderTime(hour, hb, minute, mb, second, sb, time, tb);
     context.restore();
 
     setTimeout(function() {
@@ -235,6 +429,13 @@ function renderAmbientMinuteNeedle(minute) {
     context.closePath();
     context.restore();
 }
+function showClock() {
+	if (document.getElementById("clock").style.display == 'none') {
+		document.getElementById("clock").style.display = 'inline';
+	}else {
+		document.getElementById("clock").style.display = 'none';
+	}	
+}
 
 function ambientWatch() {
     'use strict';
@@ -258,8 +459,9 @@ function ambientWatch() {
 window.onload = function onLoad() {
     'use strict';
 
-    canvas = document.querySelector('canvas');
+    canvas = document.getElementById("dots");
     context = canvas.getContext('2d');
+    
     clockRadius = document.body.clientWidth / 2;
     
     // Assigns the area that will use Canvas
