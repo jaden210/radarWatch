@@ -1,4 +1,4 @@
-var canvas,bCanvas,bContext, context, clockRadius, isAmbientMode;
+var canvas, context, clockRadius, isAmbientMode;
 
 window.requestAnimationFrame = window.requestAnimationFrame ||
     window.webkitRequestAnimationFrame ||
@@ -9,35 +9,31 @@ window.requestAnimationFrame = window.requestAnimationFrame ||
         'use strict';
         window.setTimeout(callback, 1000 / 60);
     };
-var bs = "#00ff00";
 var hcounter = 0,
 	mcounter = 0,
-	scounter = 0,
-	tcounter = 0;
+	scounter = 0;
 var hb = 0.3,
 	mb = 0.3,
 	sb = 0.3,
-	tb = 0.3;
+	hnc = '#FFF',
+	mnc = '#FFF',
+	snc = '#FFF';
 
 	
 function renderDots() {
     'use strict';
 
-    var dx = 0,
-        dy = 0,
-        i = 1,
-        angle = null;
+    
     context.save();
 
     // Assigns the clock creation location in the middle of the canvas
     context.translate(canvas.width / 2, canvas.height / 2);
 }
 
-function renderTime(hour, hb, minute, mb, second, sb, time ,tb) {
+function renderTime(hour, minute, second, time) {
     'use strict';
 
-    var angle = null,
-    	hxangle = null,
+    var hxangle = null,
     	hyangle = null,
     	mxangle = null,
     	myangle = null,
@@ -45,41 +41,118 @@ function renderTime(hour, hb, minute, mb, second, sb, time ,tb) {
     	syangle = null,
         radius = null;
 
-    hxangle = 96* Math.cos(((hour-3)*-1) * (Math.PI * 2) / 12);
-    hyangle = 96* Math.sin((hour-3)      * (Math.PI * 2) / 12);
-    mxangle = 138* Math.cos(((minute-15)*-1) * (Math.PI * 2) / 60);
-    myangle = 138* Math.sin((minute-15)      * (Math.PI * 2) / 60);
-    sxangle = 160* Math.cos(((second-15)*-1) * (Math.PI * 2) / 60);
-    syangle = 160* Math.sin((second-15)      * (Math.PI * 2) / 60);
+    hxangle = 116* Math.cos(((hour-3)*-1) * (Math.PI * 2) / 12);
+    hyangle = 116* Math.sin((hour-3)      * (Math.PI * 2) / 12);
+    mxangle = 142* Math.cos(((minute-15)*-1) * (Math.PI * 2) / 60);
+    myangle = 142* Math.sin((minute-15)      * (Math.PI * 2) / 60);
+    sxangle = 166* Math.cos(((second-15)*-1) * (Math.PI * 2) / 60);
+    syangle = 166* Math.sin((second-15)      * (Math.PI * 2) / 60);
     radius = clockRadius * 0.55;
     //RENDER
-    context.save();
-    context.beginPath();
-    context.shadowOffsetX = canvas.width;    
-    context.shadowOffsetY = 0;
-    context.shadowColor = '#22ef0c';
-    context.shadowBlur = 30;
-    context.globalAlpha = mb;
-    context.fillStyle = '#22ef0c';
-    context.arc(mxangle,myangle,10,0,Math.PI * 2, true);
-    context.closePath();
-    context.fill();
-    context.beginPath();
-    context.globalAlpha = hb;    
-    context.arc(hxangle,hyangle,10,0,Math.PI * 2, true);
-    context.closePath();
-    context.fill();
-    context.beginPath();
-    context.globalAlpha = sb;
-    context.arc(sxangle,syangle,10,0,Math.PI * 2, true);
-    context.closePath();
-    context.fill();
-    context.restore();
+
+    drawStar(hxangle, hyangle, 5, 9, 5, hnc, hb);
+    drawStar1(mxangle, myangle, 5, 9, 5, mnc, mb);
+    drawStar2(sxangle, syangle, 5, 9, 5, snc, sb);
 
     document.getElementById("clock").innerHTML = time;
     document.getElementById("clock").style.color="#22ef0c";
     document.getElementById("clock").style.opacity=0.8;
     document.getElementById("clock").style.fontSize="xx-large";
+}
+//hour
+function drawStar(cx, cy, spikes, outerRadius, innerRadius, hnc, hb) {
+    var rot = Math.PI / 2 * 3;
+    var x = cx;
+    var y = cy;
+    var step = Math.PI / spikes;
+
+    context.strokeSyle = hnc;
+    context.beginPath();
+    context.moveTo(cx, cy - outerRadius);
+    for (i = 0; i < spikes; i++) {
+        x = cx + Math.cos(rot) * outerRadius;
+        y = cy + Math.sin(rot) * outerRadius;
+        context.lineTo(x, y);
+        rot += step;
+
+        x = cx + Math.cos(rot) * innerRadius;
+        y = cy + Math.sin(rot) * innerRadius;
+        context.lineTo(x, y);
+        rot += step;
+    }
+    context.lineTo(cx, cy - outerRadius);
+    context.closePath();
+    context.globalAlpha = hb; 
+    context.lineWidth=5;
+    context.strokeStyle= hnc;
+    context.stroke();
+    context.globalAlpha = hb; 
+    context.fillStyle= hnc;
+    context.fill();
+
+}
+//minute
+function drawStar1(cx, cy, spikes, outerRadius, innerRadius, mnc, mb) {
+    var rot = Math.PI / 2 * 3;
+    var x = cx;
+    var y = cy;
+    var step = Math.PI / spikes;
+
+    context.strokeSyle = mnc;
+    context.beginPath();
+    context.moveTo(cx, cy - outerRadius);
+    for (i = 0; i < spikes; i++) {
+        x = cx + Math.cos(rot) * outerRadius;
+        y = cy + Math.sin(rot) * outerRadius;
+        context.lineTo(x, y);
+        rot += step;
+
+        x = cx + Math.cos(rot) * innerRadius;
+        y = cy + Math.sin(rot) * innerRadius;
+        context.lineTo(x, y);
+        rot += step;
+    }
+    context.lineTo(cx, cy - outerRadius);
+    context.closePath();
+    context.lineWidth=5;
+    context.globalAlpha = mb; 
+    context.strokeStyle= mnc;
+    context.stroke();
+    context.globalAlpha = mb; 
+    context.fillStyle= mnc;
+    context.fill();
+
+}
+//second
+function drawStar2(cx, cy, spikes, outerRadius, innerRadius, snc, sb) {
+    var rot = Math.PI / 2 * 3;
+    var x = cx;
+    var y = cy;
+    var step = Math.PI / spikes;
+
+    context.beginPath();
+    context.moveTo(cx, cy - outerRadius);
+    for (i = 0; i < spikes; i++) {
+        x = cx + Math.cos(rot) * outerRadius;
+        y = cy + Math.sin(rot) * outerRadius;
+        context.lineTo(x, y);
+        rot += step;
+
+        x = cx + Math.cos(rot) * innerRadius;
+        y = cy + Math.sin(rot) * innerRadius;
+        context.lineTo(x, y);
+        rot += step;
+    }
+    context.lineTo(cx, cy - outerRadius);
+    context.closePath();
+    context.lineWidth=5;
+    context.globalAlpha = sb; 
+    context.strokeStyle= snc;
+    context.stroke();
+    context.globalAlpha = sb; 
+    context.fillStyle= snc;
+    context.fill();
+
 }
 
 
@@ -120,10 +193,6 @@ function watch() {
     	tempHour = hour;
     }
     
-    //blip counter
-    var hourBlip = tempHour*5,
-    	minuteBlip = minute,
-    	secondBlip = second;
     
   //find the rotation of the radar
     var el = document.getElementById("spinner");
@@ -140,10 +209,7 @@ function watch() {
          values = values.split(',');
      var a = values[0];
      var b = values[1];
-     var c = values[2];
-     var d = values[3];
 
-     var scale = Math.sqrt(a*a + b*b);
      //fix radar angle
      var radarAngle = Math.round(Math.atan2(b, a) * (180/Math.PI));
      if (radarAngle <= 0) {
@@ -160,7 +226,9 @@ function watch() {
     
     //hour blip fade
     if (radarAngle > hourAngle && radarAngle < hourAngle + 20) {
-    	hb =0.9;
+    	hb =1;
+    	//hnc = '#'+('00000'+(Math.random()*16777216<<0).toString(16)).substr(-6);
+    	hnc ='#750787';
     }
     if (hb > 0.3) {
     	hcounter ++;
@@ -214,6 +282,8 @@ function watch() {
     //minute blip fade
     if (radarAngle > minuteAngle && radarAngle < minuteAngle + 20) {
     	mb =0.9;
+    	//mnc = '#'+('00000'+(Math.random()*16777216<<0).toString(16)).substr(-6);
+    	mnc = '#004dff';
     }
     if (mb > 0.3) {
     	mcounter ++;
@@ -267,6 +337,8 @@ function watch() {
     //second blib fade
     if (radarAngle > secondAngle && radarAngle < secondAngle + 20) {
     	sb =0.9;
+    	//snc = '#'+('00000'+(Math.random()*16777216<<0).toString(16)).substr(-6);
+    	snc = '#008026';
     }
     if (sb > 0.3) {
     	scounter ++;
@@ -317,59 +389,6 @@ function watch() {
     	break;
     }
     
-    //time fade
-    if (radarAngle > 0 && radarAngle <  20) {
-    	tb =0.9;
-    }
-    if (tb > 0.3) {
-    	tcounter ++;
-    }
-    switch (tcounter) {
-    case 2:
-    	tb = 0.80;
-    	break;
-    case 4:
-    	tb = 0.78;
-    	break;
-    case 6:
-    	tb = 0.74;
-    	break;
-    case 8:
-    	tb = 0.70;
-    	break;
-    case 10:
-    	tb = 0.66;
-    	break;
-    case 12:
-    	tb = 0.62;
-    	break;
-    case 14:
-    	tb = 0.58;
-    	break;
-    case 16:
-    	tb = 0.54;
-    	break;
-    case 18:
-    	tb = 0.50;
-    	break;
-    case 20:
-    	tb = 0.46;
-    	break;
-    case 22:
-    	tb = 0.42;
-    	break;
-    case 24:
-    	tb = 0.38;
-    	break;
-    case 26:
-    	tb = 0.34;
-    	break;
-    case 28:
-    	tb = 0.3;
-    	tcounter = 0;
-    	break;
-    }
-    
     
     if	(hours > 12) {
     	var thour = hours - 12;
@@ -378,7 +397,7 @@ function watch() {
     }
    var time =  ("00" + thour).slice(-2) + ":" + ("0" + minutes).slice(-2) + ":" + ("0" + seconds).slice(-2); 
     
-    renderTime(hour, hb, minute, mb, second, sb, time, tb);
+    renderTime(hour, minute, second, time);
     context.restore();
 
     setTimeout(function() {
@@ -436,6 +455,7 @@ function showClock() {
 		document.getElementById("clock").style.display = 'none';
 	}	
 }
+
 
 function ambientWatch() {
     'use strict';

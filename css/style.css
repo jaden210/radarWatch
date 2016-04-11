@@ -42,7 +42,6 @@ body {
   left: 0;
   display: table-cell;
   vertical-align: middle;
-  background: url('../src/background.png') no-repeat 0 0;
 }
 #spinner { 
     -moz-animation:8s rotateRight infinite linear; 
